@@ -1,0 +1,29 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Local settings and keys: never commit
+.env
+*.pem
+
+# Terraform. State and plans hold every value Terraform handled,
+# including the database password, in clear text.
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+crash.log
+
+# Rendered from a template, so they hold real values
+*.rendered
+policy.json
+trust.json
+*.local.yaml
+*.local.sh
+
+# Downloads and system files
+*.pkg
+.DS_Store
