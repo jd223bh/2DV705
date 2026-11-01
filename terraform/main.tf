@@ -27,10 +27,10 @@ data "aws_caller_identity" "me" {}
 
 # The database password, generated rather than typed. Its result is stored in
 # terraform.tfstate in clear text — open the file and look. That is task 16.
-resource "random_password" "db" {
-  length  = 20
-  special = false # letters and digits only: safe in SQL, YAML and env files
-}
+#resource "random_password" "db" {
+ # length  = 20
+ # special = false # letters and digits only: safe in SQL, YAML and env files
+#}
 
 data "aws_availability_zones" "here" {
   state = "available"
@@ -280,13 +280,15 @@ resource "aws_instance" "db" {
   vpc_security_group_ids      = [aws_security_group.db.id]
   associate_public_ip_address = false # no address on the internet at all
   key_name                    = var.key_name
+  iam_instance_profile = aws_iam_instance_profile.db.name
 
   # cloud-init only runs on first boot. Without this, changing the user data
   # updates the instance in place and the new script never executes — task 16
   # would look finished while nothing actually read from SSM.
   user_data_replace_on_change = true
   user_data = templatefile("${path.module}/cloud-config-db.yaml.tftpl", {
-    db_pass = random_password.db.result
+    #db_pass = random_password.db.result
+    region = var.region 
   })
 
   # Nothing in this block refers to the NAT route, so Terraform would happily
@@ -317,7 +319,7 @@ resource "aws_instance" "web" {
   user_data_replace_on_change = true
   user_data = templatefile("${path.module}/cloud-config-web.yaml.tftpl", {
     db_host = aws_instance.db.private_ip
-    db_pass = random_password.db.result
+    #db_pass = random_password.db.result
     bucket  = aws_s3_bucket.notes.id
     region  = var.region
     repo    = var.repo_url
